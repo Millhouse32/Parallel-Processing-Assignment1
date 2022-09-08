@@ -7,8 +7,11 @@ int main(void) {
     int comm_sz; // number of process
     int my_rank; // process rank
     FILE* file; // my-data.txt
-    long numbytes;
-    char *text;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+    int row;
+    int col;
 
     const int MAX_STRING = 100;
 
@@ -27,17 +30,15 @@ int main(void) {
             printf("Error opening file");
             exit(0);
         }
-
-        fseek(file, 0L, SEEK_END);
-        numbytes = ftell(file);
-        fseek(file, 0L, SEEK_SET);
-
-        text = (char*)calloc(numbytes, sizeof(char));
-
-        fread(text, sizeof(char), numbytes, file);
+        
+        int lineCount = 0;
+        while(fscanf(file, "%d%d", &row, &col) == 2)
         fclose(file);
 
-        printf("%s", text);
+        printf("Num Row: %d",row);
+        printf("\n");
+        printf("Num Col: %d", col);
+        printf("\n");
     }
     MPI_Finalize();
 
