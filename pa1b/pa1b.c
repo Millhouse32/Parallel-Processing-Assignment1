@@ -35,11 +35,6 @@ int main(void) {
         fscanf(file, "%d", &row);
         fscanf(file, "%d", &col);
 
-
-        printf("Num Row: %d",row);
-        printf("\n");
-        printf("Num Col: %d", col);
-        printf("\n");
         int matrix[row][col];
         int num;
         int vector[col];
@@ -59,6 +54,7 @@ int main(void) {
         fclose(file);
 
         // printing matrix and vector
+        printf("Matrix:\n");
         for(int i = 0; i < row; i++){
             for(int j = 0; j < col; j++){
                 printf("%d ", matrix[i][j]);
@@ -66,10 +62,12 @@ int main(void) {
             printf("\n");
         }
         printf("\n");
+        printf("Vector: ");
         for(int i = 0; i < col; i++) {
             printf("%d ", vector[i]);
         }
         printf("\n");
+        printf("Results:\n");
     }
     MPI_Finalize();
 
