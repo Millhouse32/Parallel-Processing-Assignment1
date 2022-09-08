@@ -32,13 +32,34 @@ int main(void) {
         }
         
         int lineCount = 0;
-        while(fscanf(file, "%d%d", &row, &col) == 2)
-        fclose(file);
+        fscanf(file, "%d", &row);
+        fscanf(file, "%d", &col);
+
 
         printf("Num Row: %d",row);
         printf("\n");
         printf("Num Col: %d", col);
         printf("\n");
+        int matrix[row][col];
+        int num;
+        int vector[];
+        
+        for (int i = 0; i < row; i++){
+            for(int j = 0; j < col; j++){
+                fscanf(file, "%d", &num);
+                matrix[i][j] = num;
+            }
+        }
+
+        fclose(file);
+
+        // printing matrix
+        for(int i = 0; i < row; i++){
+            for(int j = 0; j < col; j++){
+                printf("%d ", matrix[i][j]);
+            }
+            printf("\n");
+        }
     }
     MPI_Finalize();
 
