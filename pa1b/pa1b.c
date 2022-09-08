@@ -39,4 +39,7 @@ int main(void) {
 
         printf("%s", text);
     }
+    MPI_Finalize();
+
+    return 0;
 }
