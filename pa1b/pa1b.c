@@ -42,7 +42,7 @@ int main(void) {
         printf("\n");
         int matrix[row][col];
         int num;
-        int vector[];
+        int vector[col];
         
         for (int i = 0; i < row; i++){
             for(int j = 0; j < col; j++){
@@ -51,15 +51,25 @@ int main(void) {
             }
         }
 
+        for (int i = 0; i < col; i ++){
+            fscanf(file, "%d", &num);
+            vector[i] = num;
+        }
+
         fclose(file);
 
-        // printing matrix
+        // printing matrix and vector
         for(int i = 0; i < row; i++){
             for(int j = 0; j < col; j++){
                 printf("%d ", matrix[i][j]);
             }
             printf("\n");
         }
+        printf("\n");
+        for(int i = 0; i < col; i++) {
+            printf("%d ", vector[i]);
+        }
+        printf("\n");
     }
     MPI_Finalize();
 
