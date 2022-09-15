@@ -1,0 +1,2 @@
+# Description
+Write a parallel program to multiply a mxn matrix and nx1 vector. Your program should read the matrix and the vector from a data file (mv-data.txt) and print the results on the screen (assuming you only have 2 core processors).
