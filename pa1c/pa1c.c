@@ -13,21 +13,32 @@ void Create_Array(int *m, int *n, int array[], int size, int my_rank);
 void Calculate_Fact(int array[], int size, int my_rank);
 
 int main(void) {
+
+	int arraySizes[] = { 1000, 4000, 8000, 16000 };
+
+	MPI_Init(NULL, NULL);
+
 	int m, local_m, n, local_n;
 	int my_rank, comm_sz;
 	MPI_Comm comm;
-	int array[10];
 
-	MPI_Init(NULL, NULL);
 	comm = MPI_COMM_WORLD;
 	MPI_Comm_size(comm, &comm_sz);
 	MPI_Comm_rank(comm, &my_rank);
 
 	Get_M_N(&m, &n, my_rank, comm_sz, comm);
 
-	Create_Array(&m, &n, array, 10, my_rank);
+	for (int i = 0; i < 4; i++){
+		int size = arraySizes[i];
+		int array[size];
 
-	Calculate_Fact(array, 10, my_rank);
+		Create_Array(&m, &n, array, size, my_rank);
+
+		Calculate_Fact(array, size, my_rank);
+
+		if (my_rank ==0)
+			printf("Factorial with array size %d is done.\n", size);
+	}
 
 	MPI_Finalize();
 }
@@ -54,18 +65,18 @@ void Get_M_N(int* m, int* n, int my_rank, int comm_sz, MPI_Comm comm) {
 void Create_Array(int* m, int* n, int array[], int size, int my_rank) {
 	if (my_rank == 0)
 	{
+		// seed random generator
 		srand ( time(NULL) );
-		
+
 		for (int i = 0; i < size; i++){
 			int num = (rand() %
 	        (*n - *m + 1)) + *m;
 	        array[i] = num;
 		}
 
-		for (int i = 0; i < size; i ++){
-			printf("%d, ",array[i]);
-		}
-		printf("\n");
+		// for (int i = 0; i < size; i ++){
+		// 	printf("%d, ",array[i]);
+		// }
 	}
 }
 
@@ -78,7 +89,7 @@ void Calculate_Fact(int array[], int size, int my_rank) {
 		MPI_Send(array, size, MPI_INT, 1, tag, MPI_COMM_WORLD);
 		MPI_Recv(fact, size, MPI_INT, 1, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		for (int i = 0; i < size; i++) {
-			printf("Process %d, Result=%d\n", my_rank, fact[i]);
+			//printf("Process %d, Result=%d\n", my_rank, fact[i]);
 		}
 	}
 	else {
