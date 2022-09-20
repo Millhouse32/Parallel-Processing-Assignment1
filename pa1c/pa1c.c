@@ -8,12 +8,13 @@
 
 void Get_M_N(int* m, int* n, int my_rank, int comm_sz, MPI_Comm comm);
 
-//void Create_Array(int *m, int *n)
+void Create_Array(int *m, int *n, int array[], int size);
 
 int main(void) {
 	int m, local_m, n, local_n;
 	int my_rank, comm_sz;
 	MPI_Comm comm;
+	int array[1000];
 
 	MPI_Init(NULL, NULL);
 	comm = MPI_COMM_WORLD;
@@ -24,6 +25,8 @@ int main(void) {
 
 	printf("M :: %d\n", m);
 	printf("N :: %d\n", n);
+
+	Create_Array(&m, &n, array, 1000);
 
 	MPI_Finalize();
 }
@@ -46,5 +49,20 @@ void Get_M_N(int* m, int* n, int my_rank, int comm_sz, MPI_Comm comm) {
 		MPI_Bcast(m, 1, MPI_INT, 0, comm);
 		MPI_Bcast(n, 1, MPI_INT, 0, comm);
 
+	}
+}
+
+void Create_Array(int* m, int* n, int array[], int size) {
+	
+	if (my_rank == 0) {
+		for (int i = 0; i < size; i++){
+			int num = (rand() %
+	        (*n - *m + 1)) + *m;
+	        array[i] = num;
+		}
+
+		for (int i = 0; i < size; i++) {
+			printf("%d, ", array[i]);
+		}
 	}
 }
