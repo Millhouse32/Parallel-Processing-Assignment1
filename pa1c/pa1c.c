@@ -16,7 +16,7 @@ int main(void) {
 	int m, local_m, n, local_n;
 	int my_rank, comm_sz;
 	MPI_Comm comm;
-	int array[100];
+	int array[10];
 
 	MPI_Init(NULL, NULL);
 	comm = MPI_COMM_WORLD;
@@ -25,9 +25,9 @@ int main(void) {
 
 	Get_M_N(&m, &n, my_rank, comm_sz, comm);
 
-	Create_Array(&m, &n, array, 100, my_rank);
+	Create_Array(&m, &n, array, 10, my_rank);
 
-	Calculate_Fact(array, 100, my_rank);
+	Calculate_Fact(array, 10, my_rank);
 
 	MPI_Finalize();
 }
@@ -54,6 +54,8 @@ void Get_M_N(int* m, int* n, int my_rank, int comm_sz, MPI_Comm comm) {
 void Create_Array(int* m, int* n, int array[], int size, int my_rank) {
 	if (my_rank == 0)
 	{
+		srand ( time(NULL) );
+		
 		for (int i = 0; i < size; i++){
 			int num = (rand() %
 	        (*n - *m + 1)) + *m;
@@ -72,16 +74,16 @@ void Calculate_Fact(int array[], int size, int my_rank) {
 	int tag = 100;
 
 	if (my_rank == 0) {
-		int fact[100] = {0};
-		MPI_Send(array, 100, MPI_INT, 1, tag, MPI_COMM_WORLD);
-		MPI_Recv(fact, 100, MPI_INT, 1, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		int fact[size];
+		MPI_Send(array, size, MPI_INT, 1, tag, MPI_COMM_WORLD);
+		MPI_Recv(fact, size, MPI_INT, 1, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		for (int i = 0; i < size; i++) {
 			printf("Process %d, Result=%d\n", my_rank, fact[i]);
 		}
 	}
-	else if (my_rank==1){
-		int fact[100] = {0};
-		MPI_Recv(array, 100, MPI_INT, 0, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	else {
+		int fact[size];
+		MPI_Recv(array, size, MPI_INT, 0, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		// calc factorial
 		for (int i = 0; i < size; i++) {
 			int f = 1;
@@ -90,7 +92,7 @@ void Calculate_Fact(int array[], int size, int my_rank) {
 			}
 			fact[i] = f;
 		}
-		MPI_Send(fact,100, MPI_INT,0,tag, MPI_COMM_WORLD);
+		MPI_Send(fact,size, MPI_INT,0,tag, MPI_COMM_WORLD);
 		MPI_Comm_size (MPI_COMM_WORLD, &size);
 	}
 }
