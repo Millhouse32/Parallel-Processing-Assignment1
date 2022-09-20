@@ -20,6 +20,7 @@ int main(void) {
 	MPI_Comm_rank(comm, &my_rank);
 
 	Get_M_N(&m, &local_m, &n, &local_n, my_rank, comm_sz, comm);
+	MPI_Finalize();
 }
 
 void Get_M_N(int* m, int* n, int* local_m, int* local_n, int my_rank,
@@ -31,7 +32,15 @@ int comm_sz, MPI_Comm comm) {
 		printf("Enter value for N\n");
 		scanf("%d", n);
 
+		FILE* file;
+		file = fopen("performance.txt", "w+");
+		fprintf(file,"Value for M: %d\n", *m);
+		fprintf(file,"Value for N: %d\n", *n);
+
+		fclose(file);
+
 		MPI_Bcast(m, 1, MPI_INT, 0, comm);
 		MPI_Bcast(n, 1, MPI_INT, 0, comm);
+
 	}
 }
