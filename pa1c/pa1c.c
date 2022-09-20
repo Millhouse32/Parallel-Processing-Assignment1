@@ -16,6 +16,9 @@ int main(void) {
 
 	int arraySizes[] = { 1000, 4000, 8000, 16000 };
 
+	// time variables
+	double start, finish, loc_elapsed, elapsed;
+
 	MPI_Init(NULL, NULL);
 
 	int m, local_m, n, local_n;
@@ -33,13 +36,17 @@ int main(void) {
 		int array[size];
 
 		Create_Array(&m, &n, array, size, my_rank);
-
+		start = MPI_Wtime();
 		Calculate_Fact(array, size, my_rank);
+		finish = MPI_Wtime();
+		loc_elapsed = finish-start;
+		MPI_Reduce(&loc_elapsed, &elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, comm);
 
-		if (my_rank ==0)
+		if (my_rank ==0) {
 			printf("Factorial with array size %d is done.\n", size);
+			printf("Elapsed time :: %f\n\n", elapsed);
+		}
 	}
-
 	MPI_Finalize();
 }
 
