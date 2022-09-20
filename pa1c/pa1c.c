@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpi.h>
-#include <timer.h>
+#include "timer.h"
 
 void Get_M_N(int* m, int* n, int* local_m, int* local_n, int my_rank,
 int comm_sz, MPI_Comm comm);
@@ -22,7 +22,7 @@ int main(void) {
 	Get_M_N(&m, &local_m, &n, &local_n, my_rank, comm_sz, comm);
 }
 
-Get_M_N(int* m, int* n, int* local_m, int* local_n, int my_rank,
+void Get_M_N(int* m, int* n, int* local_m, int* local_n, int my_rank,
 int comm_sz, MPI_Comm comm) {
 
 	if (my_rank == 0) {
