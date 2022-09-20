@@ -6,8 +6,9 @@
 #include <mpi.h>
 #include "timer.h"
 
-void Get_M_N(int* m, int* n, int* local_m, int* local_n, int my_rank,
-int comm_sz, MPI_Comm comm);
+void Get_M_N(int* m, int* n, int my_rank, int comm_sz, MPI_Comm comm);
+
+//void Create_Array(int *m, int *n)
 
 int main(void) {
 	int m, local_m, n, local_n;
@@ -19,12 +20,15 @@ int main(void) {
 	MPI_Comm_size(comm, &comm_sz);
 	MPI_Comm_rank(comm, &my_rank);
 
-	Get_M_N(&m, &local_m, &n, &local_n, my_rank, comm_sz, comm);
+	Get_M_N(&m, &n, my_rank, comm_sz, comm);
+
+	printf("M :: %d\n", m);
+	printf("N :: %d\n", n);
+
 	MPI_Finalize();
 }
 
-void Get_M_N(int* m, int* n, int* local_m, int* local_n, int my_rank,
-int comm_sz, MPI_Comm comm) {
+void Get_M_N(int* m, int* n, int my_rank, int comm_sz, MPI_Comm comm) {
 
 	if (my_rank == 0) {
 		printf("Enter value for M\n");
