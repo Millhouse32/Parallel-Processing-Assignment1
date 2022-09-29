@@ -1,76 +1,71 @@
-#include <mpi.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include <mpi.h>
 
 const int MAX_STRING = 100;
 
 int main(void){
-  int comm_sz;  // number of process
-  int my_rank; // process rank
-  FILE* file; // hello.html
+        // declare variables used
+        int commSize;
+        int myRank;
+        // pointer to the input file
+        FILE* inputFile;
+        const int MAX_STRING = 100;
 
-  const int MAX_STRING = 100;
+        char *testPTR = "Programming Assignment 1";
+        char *text;
+        char *contents;
+        long numBytes;
 
-  char *test = "hello world";
-  char *text;
-  char *contents;
-  long numbytes;
+        //Initialize MPI
+        MPI_Init(NULL, NULL);
 
-  // Start up MPI
-  MPI_Init(NULL, NULL);
+        //Determine num of processes
+        MPI_Comm_size(MPI_COMM_WORLD, &commSize);
+        MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-  // Get the number of processes
-  MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
+        if(myRank == 0){
+                inputFile = fopen("hello.html", "r");
 
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+                if(NULL == inputFile){
+                        printf("Error: Cannot open input file");
+                        exit(0);
+                }
 
-  if (my_rank != 0) {
-    MPI_Recv(contents, numbytes, MPI_CHAR, 0, 0, MPI_COMM_WORLD,
-      MPI_STATUS_IGNORE);
+                fseek(inputFile, 0L, SEEK_END);
+                numBytes = ftell(inputFile);
+                fseek(inputFile, 0L, SEEK_SET);
 
-    char *str;
-    int len = strlen(contents);
-    int len1 = len/2;
-    int len2 = len - len1;
+                text = (char*)calloc(numBytes, sizeof(char));
 
-    if (my_rank == 1){
-      str = malloc(len1+1);
-      memcpy(str, contents, len1);
-      //str[len1] = '\0';
-    }
-    else {
-      str = malloc(len2+1);
-      memcpy(str, contents+len1, len2);
-      //str[len2] = '\0';
-    }
+                fread(text, sizeof(char), numBytes, inputFile);
+                fclose(inputFile);
+                for(int thread = 1; thread < commSize; thread++){
+                        MPI_Send(text, strlen(text)+1, MPI_CHAR, thread, 0, MPI_COMM_WORLD);
+                }
+        }
+        else {
+                MPI_Recv(contents, numBytes, MPI_CHAR, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
-    printf("Process number :: %d\n", my_rank);
-    printf("%s\n", str);
-  }
+                char *string;
+                int length = strlen(contents);
+                int lengthHalfed = length/2;
+                int secondaryLength = length - lengthHalfed;
 
-  else {
-    file = fopen("hello.html", "r");
+                if(myRank == 1){
+                        string = malloc(lengthHalfed + 1);
+                        memcpy(string, contents, lengthHalfed);
+                }
+                else {
+                        string = malloc(secondaryLength + 1);
+                        memcpy(string, contents + lengthHalfed, secondaryLength);
+                }
+                printf("Process Number: %d\n", myRank);
+                printf("%s\n", string);
+        }
 
-    if (NULL == file){
-      printf("Error opening file");
-      exit(0);
-    }
+        MPI_Finalize();
 
-    fseek(file, 0L, SEEK_END);
-    numbytes = ftell(file);
-    fseek(file, 0L, SEEK_SET);
-
-    text = (char*)calloc(numbytes, sizeof(char));
-
-    fread(text, sizeof(char), numbytes, file);
-    fclose(file);
-    for (int dest = 1; dest < comm_sz; dest++) {
-      MPI_Send(text, strlen(text)+1, MPI_CHAR, dest, 0, MPI_COMM_WORLD);
-    }
-  }
-
-  MPI_Finalize();
-
-  return 0;
+        return 0;
 }

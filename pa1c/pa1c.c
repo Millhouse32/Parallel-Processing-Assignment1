@@ -16,7 +16,9 @@ int a2[16000];
 
 int main(void) {
 
-	int arraySizes[] = { 1000, 4000, 8000, 16000 };
+	double start, finish, loc_elapsed, elapsed;
+
+	int arraySizes[] = { 1000, 2000, 4000, 8000, 16000 };
 
 	int m, n;
 	int my_rank, comm_sz;
@@ -37,21 +39,32 @@ int main(void) {
 
 
 	//Calc_Fact(array, size, my_rank, comm_sz);
-
-	for (int i = 0; i < 4; i++) {
+	if (my_rank == 0) {
+		FILE* file = fopen("performance.txt", "a");
+		fprintf(file, "Number of processors: %d\n", comm_sz);
+		fclose(file);
+	}
+	for (int i = 0; i < 5; i++) {
 		int size = arraySizes[i];
 		int array[size];
 
 		Create_Array(&m, &n, array, size, my_rank);
-
+		start = MPI_Wtime();
 		Calc_Fact(array, size, my_rank, comm_sz);
+		finish = MPI_Wtime();
+		loc_elapsed = finish-start;
+		MPI_Reduce(&loc_elapsed, &elapsed, 1, MPI_DOUBLE, MPI_MAX, 0, comm);
+
+
 
 		if (my_rank == 0) {
 			printf("Factorial with array size %d is done.\n", size);
+			FILE* file = fopen("performance.txt", "a");
+			fprintf(file, "Runtime with array size %d:: %lf\n", size, loc_elapsed);
+			fclose(file);
 		}
 
 	}
-
 	MPI_Finalize();
 
 	return 0;
@@ -66,7 +79,7 @@ void Get_m_n(int* m, int* n, int my_rank, int comm_sz, MPI_Comm comm) {
 		scanf("%d", n);
 
 		FILE* file;
-		file = fopen("performance.txt", "w+");
+		file = fopen("performance.txt", "a");
 		fprintf(file, "Value for M (lower bound): %d\n", *m);
 		fprintf(file, "Value for N (upper vound): %d\n", *n);
 
